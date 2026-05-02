@@ -1,9 +1,6 @@
 # Retail Sales Management System
 ### 21CSC205P – Database Management Systems Mini Project
 
-**Students:** Yash Vardhan Singh (RA2411003011056) | Aditya Pratap (RA2411003011064)  
-**Guide:** Dr. M. Karthikeyan, Associate Professor  
-**Department:** Computing Technologies, SRM Institute of Science and Technology
 
 ---
 
@@ -161,4 +158,5 @@ Expected output:
 - `backend/retailshop.db` is a legacy SQLite file and is not used by the current backend.
 - The backend uses Flask's built-in development server. For production, use a WSGI server like Gunicorn.
 - CORS is enabled to allow the frontend (opened via `file://` or `http://`) to communicate with the API.
+
 
