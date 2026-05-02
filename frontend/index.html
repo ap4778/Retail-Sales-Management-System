@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Retail Sales Management System</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; color: #333; }
+
+    header {
+      background: linear-gradient(135deg, #2c3e50, #34495e); color: white;
+      padding: 16px 24px; font-size: 24px; font-weight: bold;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    nav {
+      background: white; display: flex; gap: 10px; padding: 12px 24px; flex-wrap: wrap;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 20px;
+    }
+    nav button {
+      background: transparent; color: #555; border: 2px solid transparent;
+      padding: 8px 18px; border-radius: 20px; cursor: pointer; font-size: 15px;
+      font-weight: 600; transition: all 0.3s ease;
+    }
+    nav button:hover { background: #f0f2f5; color: #1abc9c; }
+    nav button.active { background: #1abc9c; color: white; box-shadow: 0 4px 10px rgba(26,188,156,0.3); }
+
+    .container { padding: 0 24px 24px; max-width: 1100px; margin: auto; }
+
+    .card {
+      background: white; border-radius: 12px; padding: 24px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 24px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card:hover { transform: translateY(-2px); box-shadow: 0 8px 16px rgba(0,0,0,0.1); }
+
+    h2 { color: #2c3e50; margin-bottom: 20px; font-size: 20px; border-bottom: 2px solid #f0f2f5; padding-bottom: 10px; }
+    h3 { color: #34495e; margin-bottom: 10px; font-size: 15px; }
+
+    label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px; color: #555; }
+
+    input, select {
+      width: 100%; padding: 10px 14px; border: 1px solid #ddd;
+      border-radius: 6px; font-size: 14px; margin-bottom: 16px;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    input:focus, select:focus { outline: none; border-color: #3498db; box-shadow: 0 0 0 3px rgba(52,152,219,0.2); }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+    .btn {
+      background: #3498db; color: white; border: none;
+      padding: 10px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold;
+      transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center;
+    }
+    .btn:hover { background: #2980b9; transform: translateY(-1px); box-shadow: 0 4px 8px rgba(41,128,185,0.3); }
+    .btn:active { transform: translateY(0); }
+    .btn-danger { background: #e74c3c; }
+    .btn-danger:hover { background: #c0392b; box-shadow: 0 4px 8px rgba(192,57,43,0.3); }
+    .btn-success { background: #2ecc71; }
+    .btn-success:hover { background: #27ae60; box-shadow: 0 4px 8px rgba(39,174,96,0.3); }
+
+    table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 14px; }
+    th { background: #f8f9fa; color: #2c3e50; padding: 12px; text-align: left; font-weight: 600; border-bottom: 2px solid #eee; }
+    td { padding: 12px; border-bottom: 1px solid #eee; transition: background 0.3s ease; }
+    tr { transition: transform 0.2s ease; }
+    tr:hover td { background: #f4f6f8; }
+
+    .badge {
+      display: inline-block; padding: 4px 12px; border-radius: 20px;
+      font-size: 12px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .badge-green { background: #e8f8f5; color: #1abc9c; }
+    .badge-blue  { background: #ebf5fb; color: #3498db; }
+    .badge-orange { background: #fef5e7; color: #f39c12; }
+
+    .stat-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 24px;
+    }
+    .stat-card {
+      padding: 24px; border-radius: 12px; text-align: center;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    .stat-card:hover { transform: translateY(-5px); box-shadow: 0 8px 16px rgba(0,0,0,0.1); }
+    .stat-card .value { font-size: 36px; font-weight: bold; margin-bottom: 8px; }
+    .stat-card .label { font-size: 14px; color: #7f8c8d; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    .alert {
+      padding: 12px 16px; border-radius: 6px; margin-bottom: 16px; font-size: 14px;
+    }
+    .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    .alert-danger  { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+    /* Smooth Section Transitions */
+    .section { 
+      display: none; 
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    .section.active { 
+      display: block; 
+      animation: fadeInSlideUp 0.4s ease forwards;
+    }
+
+    @keyframes fadeInSlideUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    #toast {
+      position: fixed; bottom: 30px; right: 30px;
+      background: #2c3e50; color: white;
+      padding: 14px 24px; border-radius: 8px;
+      font-size: 15px; font-weight: 500; display: none; z-index: 999;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      animation: slideInRight 0.3s ease forwards;
+    }
+
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(50px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes slideOutRight {
+      from { opacity: 1; transform: translateX(0); }
+      to { opacity: 0; transform: translateX(50px); }
+    }
+
+    .search-bar {
+      width: 100%; padding: 12px 16px; border: 1px solid #ddd;
+      border-radius: 20px; font-size: 14px; margin-bottom: 20px;
+      transition: all 0.3s ease; background: #f9fbfd;
+    }
+    .search-bar:focus { background: white; border-color: #3498db; box-shadow: 0 0 0 3px rgba(52,152,219,0.2); }
+  </style>
+</head>
+<body>
+
+<header>🛒 Retail Sales Management System</header>
+<nav id="navbar">
+  <button onclick="showSection('dashboard', this)" class="active">Dashboard</button>
+  <button onclick="showSection('customers', this)">Customers</button>
+  <button onclick="showSection('products', this)">Products</button>
+  <button onclick="showSection('sales', this)">Sales</button>
+  <button onclick="showSection('reports', this)">Reports</button>
+</nav>
+
+<div id="toast"></div>
+
+<div class="container">
+
+  <!-- ===== DASHBOARD ===== -->
+  <div id="dashboard" class="section active">
+    <div class="stat-grid">
+      <div class="stat-card" style="background:#eaf4fb">
+        <div class="value" id="statCustomers" style="color:#2980b9">0</div>
+        <div class="label">Total Customers</div>
+      </div>
+      <div class="stat-card" style="background:#eafaf1">
+        <div class="value" id="statProducts" style="color:#1abc9c">0</div>
+        <div class="label">Total Products</div>
+      </div>
+      <div class="stat-card" style="background:#fef9e7">
+        <div class="value" id="statSales" style="color:#f39c12">0</div>
+        <div class="label">Total Transactions</div>
+      </div>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-card" style="background:#fdf2f8; grid-column: span 2">
+        <div class="value" id="statRevenue" style="color:#8e44ad; font-size:24px">₹0.00</div>
+        <div class="label">Total Revenue Generated</div>
+      </div>
+      <div class="stat-card" style="background:#fef5ec">
+        <div class="value" id="statQty" style="color:#e67e22">0</div>
+        <div class="label">Total Units Sold</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Recent Sales</h2>
+      <table>
+        <thead>
+          <tr><th>Txn ID</th><th>Customer</th><th>Product</th><th>Date</th><th>Qty</th><th>Total</th></tr>
+        </thead>
+        <tbody id="recentSalesTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===== CUSTOMERS ===== -->
+  <div id="customers" class="section">
+    <div class="card">
+      <h2>Add New Customer</h2>
+      <div class="form-row">
+        <div>
+          <label>Customer ID</label>
+          <input type="number" id="custId" placeholder="e.g. 1001" />
+        </div>
+        <div>
+          <label>Age</label>
+          <input type="number" id="custAge" placeholder="e.g. 25" />
+        </div>
+      </div>
+      <label>Gender</label>
+      <select id="custGender">
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+        <option value="Other">Other</option>
+      </select>
+      <button class="btn btn-success" onclick="addCustomer()">+ Add Customer</button>
+    </div>
+    <div class="card">
+      <h2>Customer List</h2>
+      <input type="text" class="search-bar" id="custSearch" placeholder="🔍 Search by ID or gender..." oninput="renderCustomers()" />
+      <table>
+        <thead>
+          <tr><th>Customer ID</th><th>Gender</th><th>Age</th><th>Transactions</th></tr>
+        </thead>
+        <tbody id="customerTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===== PRODUCTS ===== -->
+  <div id="products" class="section">
+    <div class="card">
+      <h2>Add New Product</h2>
+      <div class="form-row">
+        <div>
+          <label>Product ID</label>
+          <input type="number" id="prodId" placeholder="e.g. 4" />
+        </div>
+        <div>
+          <label>Category</label>
+          <input type="text" id="prodCat" placeholder="e.g. Electronics" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div>
+          <label>Price Per Unit (₹)</label>
+          <input type="number" id="prodPrice" placeholder="e.g. 500.00" step="0.01" />
+        </div>
+        <div>
+          <label>COGS – Cost of Goods Sold (₹)</label>
+          <input type="number" id="prodCogs" placeholder="e.g. 300.00" step="0.01" />
+        </div>
+      </div>
+      <button class="btn btn-success" onclick="addProduct()">+ Add Product</button>
+    </div>
+    <div class="card">
+      <h2>Product List</h2>
+      <input type="text" class="search-bar" id="prodSearch" placeholder="🔍 Search by category..." oninput="renderProducts()" />
+      <table>
+        <thead>
+          <tr><th>Product ID</th><th>Category</th><th>Price/Unit (₹)</th><th>COGS (₹)</th><th>Profit Margin</th></tr>
+        </thead>
+        <tbody id="productTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===== SALES ===== -->
+  <div id="sales" class="section">
+    <div class="card">
+      <h2>Record New Sale</h2>
+      <div class="form-row">
+        <div>
+          <label>Customer ID</label>
+          <input type="number" id="txnCust" placeholder="e.g. 1001" />
+        </div>
+      </div>
+      <div style="margin-bottom: 16px;">
+        <label>Products</label>
+        <table id="saleProductsTable" style="margin-bottom: 16px; background: #fff;">
+          <thead>
+            <tr>
+              <th>Product ID</th>
+              <th>Category</th>
+              <th>Quantity</th>
+              <th>Total (₹)</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="saleProductsBody">
+            <!-- Dynamic rows will be added here -->
+          </tbody>
+        </table>
+        <button class="btn" style="background:#3498db; padding: 6px 12px; font-size: 12px;" onclick="addSaleProductRow()">+ Add Product Row</button>
+      </div>
+      <label>Grand Total (₹)</label>
+      <input type="number" id="txnTotal" placeholder="0.00" step="0.01" readonly />
+      <button class="btn btn-success" onclick="addSale()">+ Record Sale</button>
+      <p style="margin-top:10px;font-size:12px;color:#888">📅 Date and time are automatically set to system values (cannot be modified)</p>
+    </div>
+    <div class="card">
+      <h2>Sales Transactions</h2>
+      <input type="text" class="search-bar" id="salesSearch" placeholder="🔍 Search by Txn ID or Customer ID..." oninput="renderSales()" />
+      <table>
+        <thead>
+          <tr><th>Txn ID</th><th>Customer ID</th><th>Product ID</th><th>Date</th><th>Time</th><th>Qty</th><th>Total (₹)</th></tr>
+        </thead>
+        <tbody id="salesTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===== REPORTS ===== -->
+  <div id="reports" class="section">
+    <div class="card">
+      <h2>Generate Sales Report</h2>
+      <div class="form-row">
+        <div>
+          <label>Filter by Customer ID (leave blank for all)</label>
+          <input type="number" id="filterCust" placeholder="e.g. 1001" />
+        </div>
+        <div>
+          <label>Filter by Product ID (leave blank for all)</label>
+          <input type="number" id="filterProd" placeholder="e.g. 1" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div>
+          <label>From Date</label>
+          <input type="date" id="filterFrom" />
+        </div>
+        <div>
+          <label>To Date</label>
+          <input type="date" id="filterTo" />
+        </div>
+      </div>
+      <div style="margin-bottom: 16px; display: flex; gap: 10px;">
+        <button class="btn" style="background:#f39c12; padding: 6px 12px; font-size: 13px;" onclick="setQuickDate('month')">📅 Last 30 Days</button>
+        <button class="btn" style="background:#f39c12; padding: 6px 12px; font-size: 13px;" onclick="setQuickDate('week')">📅 Last 7 Days</button>
+        <button class="btn" style="background:#95a5a6; padding: 6px 12px; font-size: 13px;" onclick="setQuickDate('clear')">Clear Dates</button>
+      </div>
+      <button class="btn" onclick="generateReport()">📊 Generate Report</button>
+    </div>
+    <div class="card" id="reportCard" style="display:none">
+      <h2>Report Output</h2>
+      <div id="reportSummary" style="margin-bottom:16px"></div>
+      <table>
+        <thead>
+          <tr><th>Txn ID</th><th>Cust ID</th><th>Prod ID</th><th>Date</th><th>Qty</th><th>Total (₹)</th></tr>
+        </thead>
+        <tbody id="reportTable"></tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>Category-wise Revenue Summary</h2>
+      <table>
+        <thead>
+          <tr><th>Category</th><th>Total Transactions</th><th>Total Qty Sold</th><th>Total Revenue (₹)</th></tr>
+        </thead>
+        <tbody id="categoryTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div><!-- end container -->
+
+<script>
+  // =============================================
+  // API BASE URL
+  // =============================================
+  const API_BASE = 'http://localhost:5000/api';
+
+  // =============================================
+  // DATA STORE (loaded from API)
+  // =============================================
+  let customers = [];
+  let products = [];
+  let salesList = [];
+
+  // =============================================
+  // API HELPERS
+  // =============================================
+  async function fetchAPI(endpoint, options = {}) {
+    try {
+      const response = await fetch(`${API_BASE}${endpoint}`, {
+        ...options,
+        headers: {
+          'Content-Type': 'application/json',
+          ...options.headers
+        }
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'API request failed');
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('API Error:', error);
+      throw error;
+    }
+  }
+
+  // =============================================
+  // DATA LOADERS
+  // =============================================
+  async function loadAllData() {
+    try {
+      customers = await fetchAPI('/customers');
+      products = await fetchAPI('/products');
+      salesList = await fetchAPI('/sales');
+    } catch (error) {
+      console.error('Failed to load data:', error);
+      toast('Failed to connect to server. Make sure backend is running.', 'error');
+    }
+  }
+
+  // =============================================
+  // NAVIGATION
+  // =============================================
+  function showSection(id, buttonEl = null) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+    if (buttonEl) {
+      buttonEl.classList.add('active');
+    }
+    if (id === 'dashboard') loadDashboard();
+    if (id === 'customers') renderCustomers();
+    if (id === 'products')  renderProducts();
+    if (id === 'sales')     renderSales();
+    if (id === 'reports')   renderCategoryReport();
+  }
+
+  // =============================================
+  // TOAST NOTIFICATION
+  // =============================================
+  function toast(msg, type='success') {
+    const t = document.getElementById('toast');
+    t.textContent = (type === 'success' ? '✅ ' : '❌ ') + msg;
+    t.style.background = type === 'success' ? '#2ecc71' : '#e74c3c';
+    t.style.animation = 'none';
+    t.offsetHeight; // trigger reflow
+    t.style.animation = 'slideInRight 0.3s ease forwards';
+    t.style.display = 'block';
+    
+    setTimeout(() => {
+      t.style.animation = 'slideOutRight 0.3s ease forwards';
+      setTimeout(() => t.style.display = 'none', 300);
+    }, 3000);
+  }
+
+  // =============================================
+  // DASHBOARD
+  // =============================================
+  async function loadDashboard() {
+    try {
+      const stats = await fetchAPI('/dashboard/stats');
+      document.getElementById('statCustomers').textContent = stats.total_customers;
+      document.getElementById('statProducts').textContent  = stats.total_products;
+      document.getElementById('statSales').textContent     = stats.total_transactions;
+      document.getElementById('statRevenue').textContent = '₹' + stats.total_revenue.toFixed(2);
+      document.getElementById('statQty').textContent = stats.total_units_sold;
+
+      const recent = await fetchAPI('/dashboard/recent-sales');
+      document.getElementById('recentSalesTable').innerHTML = recent.map(s =>
+        '<tr><td>' + s.transaction_id + '</td><td>' + s.customer_id + '</td><td>' + s.product_id +
+        '</td><td>' + s.sale_date + '</td><td>' + s.quantity + '</td><td>₹' + parseFloat(s.total_sale).toFixed(2) + '</td></tr>'
+      ).join('');
+    } catch (error) {
+      console.error('Dashboard load error:', error);
+    }
+  }
+
+  // =============================================
+  // CUSTOMERS
+  // =============================================
+  async function renderCustomers() {
+    try {
+      customers = await fetchAPI('/customers');
+      const q = (document.getElementById('custSearch').value || '').toLowerCase();
+      const filtered = customers.filter(c =>
+        String(c.customer_id).includes(q) || (c.gender || '').toLowerCase().includes(q)
+      );
+      document.getElementById('customerTable').innerHTML = filtered.map(c => {
+        const txns = c.transaction_count || 0;
+        return '<tr><td>' + c.customer_id + '</td><td>' + c.gender + '</td><td>' + c.age +
+               '</td><td><span class="badge badge-blue">' + txns + ' txns</span></td></tr>';
+      }).join('') || '<tr><td colspan="4" style="text-align:center;color:#888">No customers found.</td></tr>';
+    } catch (error) {
+      console.error('Render customers error:', error);
+      document.getElementById('customerTable').innerHTML = '<tr><td colspan="4" style="text-align:center;color:#888">Failed to load customers.</td></tr>';
+    }
+  }
+
+  async function addCustomer() {
+    const id  = parseInt(document.getElementById('custId').value);
+    const gen = document.getElementById('custGender').value;
+    const age = parseInt(document.getElementById('custAge').value);
+    if (!id || !age || age < 1 || age > 120) { toast('Please fill valid ID and Age.', 'error'); return; }
+    
+    try {
+      await fetchAPI('/customers', {
+        method: 'POST',
+        body: JSON.stringify({ customer_id: id, gender: gen, age: age })
+      });
+      document.getElementById('custId').value = '';
+      document.getElementById('custAge').value = '';
+      await renderCustomers();
+      await loadDashboard();
+      toast('Customer ' + id + ' added successfully!');
+    } catch (error) {
+      toast(error.message || 'Failed to add customer', 'error');
+    }
+  }
+
+  // =============================================
+  // PRODUCTS
+  // =============================================
+  async function renderProducts() {
+    try {
+      products = await fetchAPI('/products');
+      const q = (document.getElementById('prodSearch').value || '').toLowerCase();
+      const filtered = products.filter(p => (p.category || '').toLowerCase().includes(q));
+      document.getElementById('productTable').innerHTML = filtered.map(p => {
+        const margin = p.profit_margin || 0;
+        return '<tr><td>' + p.product_id + '</td><td>' + p.category + '</td><td>₹' +
+               parseFloat(p.price_per_unit).toFixed(2) + '</td><td>₹' + parseFloat(p.cogs).toFixed(2) +
+               '</td><td><span class="badge badge-green">' + margin + '%</span></td></tr>';
+      }).join('') || '<tr><td colspan="5" style="text-align:center;color:#888">No products found.</td></tr>';
+    } catch (error) {
+      console.error('Render products error:', error);
+      document.getElementById('productTable').innerHTML = '<tr><td colspan="5" style="text-align:center;color:#888">Failed to load products.</td></tr>';
+    }
+  }
+
+  async function addProduct() {
+    const id    = parseInt(document.getElementById('prodId').value);
+    const cat   = document.getElementById('prodCat').value.trim();
+    const price = parseFloat(document.getElementById('prodPrice').value);
+    const cogs  = parseFloat(document.getElementById('prodCogs').value);
+    if (!id || !cat || isNaN(price) || isNaN(cogs)) { toast('Please fill all product fields.', 'error'); return; }
+    
+    try {
+      await fetchAPI('/products', {
+        method: 'POST',
+        body: JSON.stringify({ product_id: id, category: cat, price_per_unit: price, cogs: cogs })
+      });
+      document.getElementById('prodId').value = '';
+      document.getElementById('prodCat').value = '';
+      document.getElementById('prodPrice').value = '';
+      document.getElementById('prodCogs').value = '';
+      await renderProducts();
+      await loadDashboard();
+      toast('Product ' + id + ' (' + cat + ') added successfully!');
+    } catch (error) {
+      toast(error.message || 'Failed to add product', 'error');
+    }
+  }
+
+  // =============================================
+  // SALES
+  // =============================================
+  let saleRowCounter = 0;
+
+  function addSaleProductRow() {
+    const tbody = document.getElementById('saleProductsBody');
+    const rowId = 'sale-row-' + saleRowCounter++;
+    const tr = document.createElement('tr');
+    tr.id = rowId;
+    tr.innerHTML = `
+      <td><input type="number" class="row-prod-id" placeholder="ID" style="margin:0" oninput="onProductRowChange(this)" /></td>
+      <td class="row-category" style="font-weight:500">-</td>
+      <td><input type="number" class="row-qty" placeholder="Qty" style="margin:0" oninput="onProductRowChange(this)" /></td>
+      <td class="row-total" style="font-weight:bold">0.00</td>
+      <td><button class="btn btn-danger" style="padding: 6px 10px; font-size: 12px;" onclick="removeSaleProductRow('${rowId}')">X</button></td>
+    `;
+    tbody.appendChild(tr);
+  }
+
+  function removeSaleProductRow(rowId) {
+    document.getElementById(rowId).remove();
+    calculateGrandTotal();
+  }
+
+  function onProductRowChange(input) {
+    const tr = input.closest('tr');
+    const prodIdVal = parseInt(tr.querySelector('.row-prod-id').value);
+    const qtyVal = parseInt(tr.querySelector('.row-qty').value);
+    const catTd = tr.querySelector('.row-category');
+    const totalTd = tr.querySelector('.row-total');
+
+    let price = 0;
+    if (!isNaN(prodIdVal)) {
+      const prod = products.find(p => p.product_id === prodIdVal);
+      if (prod) {
+        catTd.textContent = prod.category;
+        catTd.style.color = '#27ae60';
+        price = parseFloat(prod.price_per_unit) || 0;
+      } else {
+        catTd.textContent = 'Not Found';
+        catTd.style.color = '#e74c3c';
+      }
+    } else {
+      catTd.textContent = '-';
+      catTd.style.color = '#333';
+    }
+
+    if (!isNaN(qtyVal) && qtyVal > 0) {
+      totalTd.textContent = (price * qtyVal).toFixed(2);
+    } else {
+      totalTd.textContent = '0.00';
+    }
+    
+    calculateGrandTotal();
+  }
+
+  function calculateGrandTotal() {
+    let grandTotal = 0;
+    document.querySelectorAll('#saleProductsBody tr').forEach(tr => {
+      grandTotal += parseFloat(tr.querySelector('.row-total').textContent) || 0;
+    });
+    document.getElementById('txnTotal').value = grandTotal.toFixed(2);
+  }
+
+  async function renderSales() {
+    try {
+      salesList = await fetchAPI('/sales');
+      const q = (document.getElementById('salesSearch').value || '').toLowerCase();
+      const filtered = salesList.filter(s =>
+        String(s.transaction_id).includes(q) || String(s.customer_id).includes(q)
+      );
+      document.getElementById('salesTable').innerHTML = filtered.map(s =>
+        '<tr><td>' + s.transaction_id + '</td><td>' + s.customer_id + '</td><td>' + s.product_id +
+        '</td><td>' + s.sale_date + '</td><td>' + s.sale_time + '</td><td>' + s.quantity +
+        '</td><td>₹' + parseFloat(s.total_sale).toFixed(2) + '</td></tr>'
+      ).join('') || '<tr><td colspan="7" style="text-align:center;color:#888">No sales found.</td></tr>';
+    } catch (error) {
+      console.error('Render sales error:', error);
+      document.getElementById('salesTable').innerHTML = '<tr><td colspan="7" style="text-align:center;color:#888">Failed to load sales.</td></tr>';
+    }
+  }
+
+  async function addSale() {
+    const custId = parseInt(document.getElementById('txnCust').value);
+    if (!custId) {
+      toast('Please enter a Customer ID.', 'error');
+      return;
+    }
+
+    const rows = document.querySelectorAll('#saleProductsBody tr');
+    if (rows.length === 0) {
+      toast('Please add at least one product row.', 'error');
+      return;
+    }
+
+    const payloadProducts = [];
+    let hasError = false;
+
+    rows.forEach(tr => {
+      const pId = parseInt(tr.querySelector('.row-prod-id').value);
+      const q = parseInt(tr.querySelector('.row-qty').value);
+      if (isNaN(pId) || isNaN(q) || q <= 0) {
+        hasError = true;
+      } else {
+        payloadProducts.push({ product_id: pId, quantity: q });
+      }
+    });
+
+    if (hasError || payloadProducts.length === 0) {
+      toast('Please fill all Product IDs and Quantities correctly.', 'error');
+      return;
+    }
+
+    try {
+      const payload = {
+        customer_id: custId,
+        products: payloadProducts
+      };
+
+      const response = await fetchAPI('/sales', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+
+      document.getElementById('txnCust').value = '';
+      document.getElementById('saleProductsBody').innerHTML = '';
+      document.getElementById('txnTotal').value = '';
+      addSaleProductRow(); // Add one empty row back
+
+      await renderSales();
+      await loadDashboard();
+      toast(`Sale ${response.transaction_id || ''} recorded successfully!`);
+    } catch (error) {
+      toast(error.message || 'Failed to record sale', 'error');
+    }
+  }
+
+  // =============================================
+  // REPORTS
+  // =============================================
+  function setQuickDate(type) {
+    const today = new Date();
+    const toDate = today.toISOString().split('T')[0];
+    let fromDate = '';
+    
+    if (type === 'month') {
+      const lastMonth = new Date();
+      lastMonth.setDate(lastMonth.getDate() - 30);
+      fromDate = lastMonth.toISOString().split('T')[0];
+    } else if (type === 'week') {
+      const lastWeek = new Date();
+      lastWeek.setDate(lastWeek.getDate() - 7);
+      fromDate = lastWeek.toISOString().split('T')[0];
+    }
+    
+    if (type === 'clear') {
+      document.getElementById('filterFrom').value = '';
+      document.getElementById('filterTo').value = '';
+    } else {
+      document.getElementById('filterFrom').value = fromDate;
+      document.getElementById('filterTo').value = toDate;
+    }
+    generateReport();
+  }
+
+  async function generateReport() {
+    const filterCustId = document.getElementById('filterCust').value;
+    const filterProdId = document.getElementById('filterProd').value;
+    const filterFrom   = document.getElementById('filterFrom').value;
+    const filterTo     = document.getElementById('filterTo').value;
+
+    let url = '/reports/sales?';
+    if (filterCustId) url += `customer_id=${filterCustId}&`;
+    if (filterProdId) url += `product_id=${filterProdId}&`;
+    if (filterFrom) url += `from_date=${filterFrom}&`;
+    if (filterTo) url += `to_date=${filterTo}&`;
+
+    let catUrl = '/reports/category-summary?';
+    if (filterFrom) catUrl += `from_date=${filterFrom}&`;
+    if (filterTo) catUrl += `to_date=${filterTo}&`;
+
+    try {
+      const result = await fetchAPI(url);
+      const filtered = result.sales;
+      const totalRev = result.summary.total_revenue;
+      const totalQty = result.summary.total_quantity;
+
+      document.getElementById('reportSummary').innerHTML =
+        '<div style="display:flex;gap:24px;flex-wrap:wrap">' +
+        '<div class="stat-card" style="background:#eaf4fb;flex:1"><div class="value" style="color:#2980b9;font-size:22px">' + filtered.length + '</div><div class="label">Transactions</div></div>' +
+        '<div class="stat-card" style="background:#eafaf1;flex:1"><div class="value" style="color:#1abc9c;font-size:22px">' + totalQty + '</div><div class="label">Units Sold</div></div>' +
+        '<div class="stat-card" style="background:#fef9e7;flex:1"><div class="value" style="color:#f39c12;font-size:22px">₹' + totalRev.toFixed(2) + '</div><div class="label">Revenue</div></div>' +
+        '</div>';
+
+      document.getElementById('reportTable').innerHTML = filtered.map(s =>
+        '<tr><td>' + s.transaction_id + '</td><td>' + s.customer_id + '</td><td>' + s.product_id +
+        '</td><td>' + s.sale_date + '</td><td>' + s.quantity + '</td><td>₹' + parseFloat(s.total_sale).toFixed(2) + '</td></tr>'
+      ).join('') || '<tr><td colspan="6" style="text-align:center;color:#888">No records match your filters.</td></tr>';
+
+      document.getElementById('reportCard').style.display = 'block';
+
+      const categoryData = await fetchAPI(catUrl);
+      document.getElementById('categoryTable').innerHTML = categoryData.map(d =>
+        '<tr><td>' + d.category + '</td><td>' + d.total_transactions + '</td><td>' + d.total_quantity + '</td><td>₹' + d.total_revenue.toFixed(2) + '</td></tr>'
+      ).join('') || '<tr><td colspan="4" style="text-align:center;color:#888">No sales data.</td></tr>';
+
+    } catch (error) {
+      toast('Failed to generate report', 'error');
+    }
+  }
+
+  async function renderCategoryReport() {
+    generateReport();
+  }
+
+  // =============================================
+  // INIT
+  // =============================================
+  async function initApp() {
+    await loadAllData();
+    await loadDashboard();
+    addSaleProductRow();
+  }
+
+  initApp();
+</script>
+</body>
+</html>
