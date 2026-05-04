@@ -164,6 +164,4 @@ Expected output:
 ![alt text](image-1.png)
 ![alt text](image-2.png)
 ![alt text](image-3.png)
-=======
 
->>>>>>> 68234ab8d8bacd3ca24f9548fedf89fbfe57e3cc
