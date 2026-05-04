@@ -162,3 +162,7 @@ Expected output:
 - The backend uses Flask's built-in development server. For production, use a WSGI server like Gunicorn.
 - CORS is enabled to allow the frontend (opened via `file://` or `http://`) to communicate with the API.
 
+![alt text](image.png)
+![alt text](image-1.png)
+![alt text](image-2.png)
+![alt text](image-3.png)
